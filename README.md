@@ -168,7 +168,7 @@ abline(v=seq(from=0,to=80,by=10),lty=2,lwd=0.5)
 and here is our figure:
 
 <p align="left">
-<img src="/gfiles/fig1.png" width="500px">
+<img src="/gfiles/fig1.png" width="600px">
 </p>
 
 * Next, we calculate a logistic regression model measuring the relationship between age-at-release and recidivism risk. Note that this code will add a purple smooth curve to the age-recidivism plot below:
@@ -220,7 +220,7 @@ Number of Fisher Scoring iterations: 4
 * Here is our updated chart:
 
 <p align="left">
-<img src="/gfiles/fig2.png" width="500px">
+<img src="/gfiles/fig2.png" width="600px">
 </p>
 
 * And, then we calculate the derivative of the logistic response function (a model that only includes age):
@@ -482,7 +482,7 @@ lines(x=age,y=p.age.female,lty=1,lwd=2,col="red")
 * Here is the plot:
 
 <p align="left">
-<img src="/gfiles/fig3.png" width="500px">
+<img src="/gfiles/fig3.png" width="600px">
 </p>
 
 * Note that this is different from estimating an interaction effect.
@@ -581,7 +581,7 @@ lines(x=age,y=p.age.female,lty=2,lwd=2,col="darkgreen")
 * The code above generates some additional information to add to the plotspace:
 
 <p align="left">
-<img src="/gfiles/fig4.png" width="500px">
+<img src="/gfiles/fig4.png" width="600px">
 </p>
 
 * We can also check to see whether the derivatives of the response function / age are equal (comparing males and females) at a particular age point say, age 20.

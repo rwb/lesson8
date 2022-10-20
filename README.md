@@ -781,11 +781,17 @@ boxplot(dvf,dvm,
 * One last point about the logistic regression model: we can code the likelihood function and use a general hill-climbing algorithm to maximize that function.
 
 ```r
-# first we rerun the standard logistic regression analysis
+# first we estimate a linear regression model:
+
+summary(lm(recid~1+male+ageyears,data=df))
+
+# then we rerun the standard logistic regression analysis
 
 m3 <- glm(recid~1+male+ageyears,data=df,family=binomial(link="logit"))
 summary(m3)
 logLik(m3)
+
+# next we call the maxLik library and write our own likelihood function
 
 library(maxLik)
 
@@ -805,7 +811,7 @@ ll4 <- function(parms)
     return(lpmf)
   }
 
-m4 <- maxLik(ll4,start=c(-0.32937423,0.40384020,-0.0328402402),
+m4 <- maxLik(ll4,start=c(-0.3802333,0.1764284,-0.0057843),
   method="BHHH",finalHessian="BHHH")
 summary(m4)
 ```
@@ -813,7 +819,31 @@ summary(m4)
 * Here are the results:
 
 ```rout
-> # first we rerun the standard logistic regression analysis
+> # first we estimate a linear regression model:
+> 
+> summary(lm(recid~1+male+ageyears,data=df))
+
+Call:
+lm(formula = recid ~ 1 + male + ageyears, data = df)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-0.4641 -0.4121 -0.3079  0.5706  0.9205 
+
+Coefficients:
+              Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  0.3802333  0.0257874   14.74  < 2e-16 ***
+male         0.1764284  0.0227369    7.76 9.42e-15 ***
+ageyears    -0.0057843  0.0004693  -12.33  < 2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.4797 on 9324 degrees of freedom
+Multiple R-squared:  0.02175,	Adjusted R-squared:  0.02154 
+F-statistic: 103.7 on 2 and 9324 DF,  p-value: < 2.2e-16
+
+> 
+> # then we rerun the standard logistic regression analysis
 > 
 > m3 <- glm(recid~1+male+ageyears,data=df,family=binomial(link="logit"))
 > summary(m3)
@@ -845,14 +875,9 @@ Number of Fisher Scoring iterations: 4
 > logLik(m3)
 'log Lik.' -6078.234 (df=3)
 > 
+> # next we call the maxLik library and write our own likelihood function
+> 
 > library(maxLik)
-Loading required package: miscTools
-
-Please cite the 'maxLik' package as:
-Henningsen, Arne and Toomet, Ott (2011). maxLik: A package for maximum likelihood estimation in R. Computational Statistics 26(3), 443-458. DOI 10.1007/s00180-010-0217-1.
-
-If you have questions, suggestions, or comments regarding the 'maxLik' package, please use a forum or 'tracker' at maxLik's R-Forge site:
-https://r-forge.r-project.org/projects/maxlik/
 > 
 > ll4 <- function(parms)
 +   {
@@ -870,21 +895,22 @@ https://r-forge.r-project.org/projects/maxlik/
 +     return(lpmf)
 +   }
 > 
-> m4 <- maxLik(ll4,start=c(-0.32937423,0.40384020,-0.0328402402),
+> m4 <- maxLik(ll4,start=c(-0.3802333,0.1764284,-0.0057843),
 +   method="BHHH",finalHessian="BHHH")
 > summary(m4)
 --------------------------------------------
 Maximum Likelihood estimation
-BHHH maximisation, 4 iterations
+BHHH maximisation, 3 iterations
 Return code 8: successive function values within relative tolerance limit (reltol)
 Log-Likelihood: -6078.234 
 3  free parameters
 Estimates:
       Estimate Std. error t value  Pr(> t)    
-[1,] -0.555804   0.126262  -4.402 1.07e-05 ***
-[2,]  0.860075   0.114838   7.489 6.92e-14 ***
+[1,] -0.555799   0.126262  -4.402 1.07e-05 ***
+[2,]  0.860071   0.114838   7.489 6.92e-14 ***
 [3,] -0.026411   0.002169 -12.177  < 2e-16 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 --------------------------------------------
 > 
+```rout

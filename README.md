@@ -1,203 +1,52 @@
+### Lesson 8 - Thursday 10/20/22
+
+* We begin by reading in our NC dataset.
+
 ```r
 # read in our dataset
 
 df <- read.csv(file="nc78.csv",sep=",",header=T)
-
-# look at a random sample of cases
-
-df[sample(nrow(df),size=25,replace=F), ]
+table(df$recid,exclude=NULL)
+3527/(5800+3527)
+table(df$male,exclude=NULL)
+table(df$recid,df$male,exclude=NULL)
 ```
 
-and here is what we get (your sample will be different from mine):
+and here is our initial output:
 
 ```rout
 > # read in our dataset
 > 
 > df <- read.csv(file="nc78.csv",sep=",",header=T)
-> 
-> # look at a random sample of cases
-> 
-> df[sample(nrow(df),size=25,replace=F), ]
-        X male ageyears recid
-4870 4870    1       57     1
-7989 7989    1       34     0
-8612 8612    1       21     0
-1835 1835    0       33     1
-5830 5830    1       44     0
-331   331    1       38     0
-4095 4095    1       40     0
-68     68    0       30     0
-1189 1189    1       30     0
-2860 2860    1       30     0
-7106 7106    1       31     1
-6078 6078    1       31     0
-6689 6689    1       19     1
-1616 1616    1       34     0
-3284 3284    1       26     1
-4524 4524    1       34     0
-4080 4080    1       25     0
-6101 6101    1       17     1
-2799 2799    1       25     1
-684   684    1       19     0
-8157 8157    1       18     1
-1481 1481    1       54     1
-1556 1556    1       60     0
-2882 2882    1       24     1
-5535 5535    1       18     0
-> 
-```
-
-* Now, we are going to look at the marginal distributions of our variables.
-* Let's begin with the dependent variable, recidivism (measured over a 70-month follow-up period):
-
-```r
-# recidivism (within 70 months)
-
-table(df$recid,exclude=NULL)
-table(df$recid)/nrow(df)
-```
-
-* Here are the results:
-
-```rout
-> # recidivism (within 70 months)
-> 
 > table(df$recid,exclude=NULL)
 
    0    1 
 5800 3527 
-> table(df$recid)/nrow(df)
-
-        0         1 
-0.6218505 0.3781495 
-> 
-```
-
-* Next, we turn to the distribution of males/females in the data and the joint distribution of sex and recidivism:
-
-```r
-# sex distribution
-
-table(df$male,exclude=NULL)
-sd <- table(df$recid,df$male,exclude=NULL)
-sd
-
-py1x1 <- sd[2,2]/(sd[1,2]+sd[2,2])
-py1x1
-py1x0 <- sd[2,1]/(sd[1,1]+sd[2,1])
-py1x0
-py1x1-py1x0
-```
-
-* This what we get:
-
-```rout
-> # sex distribution
-> 
+> 3527/(5800+3527)
+[1] 0.3781495
 > table(df$male,exclude=NULL)
 
    0    1 
  469 8858 
-> sd <- table(df$recid,df$male,exclude=NULL)
-> sd
+> table(df$recid,df$male,exclude=NULL)
    
        0    1
   0  367 5433
   1  102 3425
 > 
-> py1x1 <- sd[2,2]/(sd[1,2]+sd[2,2])
-> py1x1
-[1] 0.3866561
-> py1x0 <- sd[2,1]/(sd[1,1]+sd[2,1])
-> py1x0
-[1] 0.217484
-> py1x1-py1x0
-[1] 0.1691721
-> 
 ```
 
-* Now, we estimate a bivariate logistic regression model to corroborate what we see in the table above:
-
+* Now, we turn to the age distribution in the dataset. 
 
 ```r
-# estimate bivariate logistic regression model
-
-summary(glm(recid~1+male,data=df,family=binomial(link="logit")))
-
-logit.m <- -1.2804+1*0.8190
-exp(logit.m)/(1+exp(logit.m))
-
-logit.f <- -1.2804+0*0.8190
-exp(logit.f)/(1+exp(logit.f))
-```
-
-* These are the logistic regression results:
-
-```rout
-> # estimate bivariate logistic regression model
-> 
-> summary(glm(recid~1+male,data=df,family=binomial(link="logit")))
-
-Call:
-glm(formula = recid ~ 1 + male, family = binomial(link = "logit"), 
-    data = df)
-
-Deviance Residuals: 
-    Min       1Q   Median       3Q      Max  
--0.9888  -0.9888  -0.9888   1.3786   1.7468  
-
-Coefficients:
-            Estimate Std. Error z value Pr(>|z|)    
-(Intercept)  -1.2804     0.1119 -11.439  < 2e-16 ***
-male          0.8190     0.1140   7.182 6.88e-13 ***
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-(Dispersion parameter for binomial family taken to be 1)
-
-    Null deviance: 12370  on 9326  degrees of freedom
-Residual deviance: 12312  on 9325  degrees of freedom
-AIC: 12316
-
-Number of Fisher Scoring iterations: 4
-
-> 
-> logit.m <- -1.2804+1*0.8190
-> exp(logit.m)/(1+exp(logit.m))
-[1] 0.3866538
-> 
-> logit.f <- -1.2804+0*0.8190
-> exp(logit.f)/(1+exp(logit.f))
-[1] 0.2174821
-> 
-```
-
-* Now, we turn to the age distribution in the dataset. We start by opening a plot window and generating a barplot showing the age distribution of the persons released from North Carolina prisons in 1978:
-
-```r
-# open a 1-row, 3-column plot window
-
-par(mfrow=c(1,3))
-
-# age distribution
-
 table(df$ageyears,exclude=NULL)
 median(df$ageyears)
 mean(df$ageyears)
-barplot(table(df$ageyears),
-  xlab="Age (in years)",
-  ylab="Number of People")
 ```
 
 * Here are the results:
 
 ```rout
-> # open a 1-row, 3-column plot window
-> 
-> par(mfrow=c(1,3))
-> 
-> # age distribution
-> 
 > table(df$ageyears,exclude=NULL)
 
  16  17  18  19  20  21  22  23  24  25  26  27  28  29  30 
@@ -214,13 +63,9 @@ barplot(table(df$ageyears),
 [1] 26
 > mean(df$ageyears)
 [1] 29.32787
-> barplot(table(df$ageyears),
-+   xlab="Age (in years)",
-+   ylab="Number of People")
-> 
 ```
 
-* Next, we show how age is related to the fraction of persons who were observed to recidivate within 70 months:
+* Next, we see how age is related to the fraction of persons who were observed to recidivate within 70 months:
 
 ```r
 df$age.factor <- factor(df$ageyears,levels=16:78)
@@ -320,6 +165,12 @@ abline(v=seq(from=0,to=80,by=10),lty=2,lwd=0.5)
 > 
 ```
 
+and here is our figure:
+
+<p align="left">
+<img src="/gfiles/fig1.png" width="500px">
+</p>
+
 * Next, we calculate a logistic regression model measuring the relationship between age-at-release and recidivism risk. Note that this code will add a purple smooth curve to the age-recidivism plot below:
 
 ```r
@@ -365,6 +216,12 @@ Number of Fisher Scoring iterations: 4
 > pred.age <- exp(logit.age)/(1+exp(logit.age))
 > lines(x=x.age,y=pred.age,lty=1,lwd=2,col="purple")
 ```
+
+* Here is our updated chart:
+
+<p align="left">
+<img src="/gfiles/fig2.png" width="500px">
+</p>
 
 * And, then we calculate the derivative of the logistic response function (a model that only includes age):
 
@@ -459,23 +316,6 @@ derivative
 [1] -0.006186969
 > 
 ```
-
-* Finally, we create a boxplot showing the relationship between age at the time of release (in years) and sex (male/female):
-
-```r
-# joint age x gender distribution
-
-boxplot(df$ageyears~df$male,
-  xlab="Sex",
-  ylab="Age (in years)",
-  names=c("Females","Males"))
-```
-
-* The resulting 1x3 plotspace is here:
-
-<p align="left">
-<img src="/gfiles/age-recid.png" width="800px">
-</p>
 
 * Now, we estimate a logistic regresssion analysis with both sex and age as predictor variables. Here is the R code:
 
@@ -633,18 +473,16 @@ p.age.female <- exp(logit.age.female)/(1+exp(logit.age.female))
 logit.age.male <- -0.555808+1*0.860076-0.026411*age
 p.age.male <- exp(logit.age.male)/(1+exp(logit.age.male))
 
-# here is the plot
+# add 2 curves to the plot
 
-plot(x=age,y=p.age.male,type="l",lty=1,lwd=2,col="blue",ylim=c(0,1))
+lines(x=age,y=p.age.male,type="l",lty=1,lwd=2,col="blue",ylim=c(0,1))
 lines(x=age,y=p.age.female,lty=1,lwd=2,col="red")
-abline(h=c(0,0.2,0.4,0.6,0.8,1.0),lty=3,lwd=0.5)
-abline(v=c(20,30,40,50,60,70,80),lty=3,lwd=0.5)
 ```
 
 * Here is the plot:
 
 <p align="left">
-<img src="/gfiles/age-plot.png" width="800px">
+<img src="/gfiles/fig3.png" width="500px">
 </p>
 
 * Note that this is different from estimating an interaction effect.
@@ -736,14 +574,14 @@ p.age.male <- exp(logit.age.male)/(1+exp(logit.age.male))
 # let's add the expected failure rates from the interaction model to 
 # the plot - the lines from model 2 are dashed.
 
-lines(x=age,y=p.age.male,type="l",lty=2,lwd=2,col="blue",ylim=c(0,1))
-lines(x=age,y=p.age.female,lty=2,lwd=2,col="red")
+lines(x=age,y=p.age.male,type="l",lty=2,lwd=2,col="green",ylim=c(0,1))
+lines(x=age,y=p.age.female,lty=2,lwd=2,col="darkgreen")
 ```
 
 * The code above generates some additional information to add to the plotspace:
 
 <p align="left">
-<img src="/gfiles/age-plot2.png" width="800px">
+<img src="/gfiles/fig4.png" width="500px">
 </p>
 
 * We can also check to see whether the derivatives of the response function / age are equal (comparing males and females) at a particular age point say, age 20.
